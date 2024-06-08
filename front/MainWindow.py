@@ -58,7 +58,7 @@ class MainWindow(QMainWindow):
         cp = QDesktopWidget().availableGeometry().center()
         qr.moveCenter(cp)
         self.move(qr.topLeft())
-    
+
     def do_login(self, username, password):
         user = self.manager.login(username, password)
         if user != None:
@@ -75,7 +75,7 @@ class MainWindow(QMainWindow):
             self.id_bar.setText(str(self.user_id))
             return True
 
-        
+
 
     # ----------------뒤로 가기 버튼 관련 함수-------------------#
     def go_back_to_login(self):
@@ -112,13 +112,13 @@ class MainWindow(QMainWindow):
         self.center()
         self.setCentralWidget(self.group_select_page)
         #self.statusBar().showMessage(group['name'] + ' Select Page')
-    
+
     def go_back_to_notice_page(self, group):
         self.notice_page = NoticePage(group, self, self.group_id, self.username)
         self.setGeometry(100, 100, 400, 500)
         self.center()
         self.setCentralWidget(self.notice_page)
-    
+
     def go_back_to_debate_page(self, group):
         self.debate_page = DebatePage(group, self, self.group_id, self.username)
         self.setGeometry(100, 100, 400, 500)
@@ -131,7 +131,7 @@ class MainWindow(QMainWindow):
         all_user = self.manager.show_user(searching = option)
         only_students = [d for d in all_user if 'is_student' != False]
         return only_students
-    
+
     def get_all_user_with_professor(self):
         all_user = self.manager.show_user()
         return all_user
@@ -155,21 +155,18 @@ class MainWindow(QMainWindow):
         all_debate = self.manager.show_debate(self.group_id)
         print(all_debate)
         return all_debate
-    
-        
+
+
 
     # ---- 유저 생성 및 삭제 ----- #
     def delete_user(self, student_id):
         self.manager.delete_student(student_id)
-    
+
     def create_user(self, user_id: str, username: str, password: str, email: str, gender: str):
         self.manager.create_student(user_id, username, password, email, gender)
 
 
     # ---- 그룹 생성 및 삭제 ----- #
-    def create_group(self, group_name):
-        self.manager.create_group(group_name,self.user_id)
-
     def delete_group(self, group_id):
         self.manager.delete_group(group_id)
 
