@@ -2,11 +2,12 @@ class messageDAO:
     def __init__(self, db):
         self.db = db
 
-    def create_message(self, sender_id, receiver_id, title, content, date):     ## sender, receiver id 모두 personal_id로 가정하겠습니다.
+    def create_message(self, sender_id, receiver_id, title, content,
+                       date):  ## sender, receiver id 모두 personal_id로 가정하겠습니다.
         max_message_id_query = "SELECT MAX(message_id) FROM MessageBox"
         self.db.query(max_message_id_query)
         max_message_id = self.db.fetchone()[0]
-        next_message_id = max_message_id +1 if max_message_id is not None else 1
+        next_message_id = max_message_id + 1 if max_message_id is not None else 1
 
         query = "INSERT INTO MessageBox (message_id, sender, receiver, title, content, date) VALUES (?, ?, ?, ?, ?, ?)"
         self.db.execute(query, (next_message_id, sender_id, receiver_id, title, content, date))
@@ -21,7 +22,7 @@ class messageDAO:
         query = "SELECT sender, receiver, title, content, date FROM MessageBox WHERE message_id = ?"
         self.db.query(query, (message_id,))
         return self.db.fetchone()
-    
+
     def search_message_by_name(self, username):
         result = []
         find_Std_id_query = "SELECT student_id FROM Students where user_id = (SELECT user_id FROM Users where user_id = ?)"
@@ -31,21 +32,20 @@ class messageDAO:
         self.db.query(find_P_id_query, (username,))
         result.extend(self.db.fetchone())
 
-    def search_message_by_elseString(self, searching = None):
+    def search_message_by_elseString(self, searching=None):
         result = []
         title_query = "SELECT * FROM MessageBox WHERE title = ?"
         content_query = "SELECT * FROM MessageBox WHERE content = ?"
         date_query = "SELECT * FROM MessageBox WHERE date = ?"
-        
+
         self.db.query(title_query, (searching,))
         result.extend(self.db.fetchone())
 
-        self.db.query(content_query,(searching,))
+        self.db.query(content_query, (searching,))
         result.extend(self.db.fetchone())
 
         self.db.query(date_query, (searching,))
         result.extend(self.db.fetchone())
-
 
 
 class UserDAO:
@@ -83,7 +83,7 @@ class UserDAO:
         self.db.query(student_id_query)
         max_student_id = self.db.fetchone()[0]
         next_student_id = max_student_id + 1 if max_student_id is not None else 1
-            
+
         score_id_query = "SELECT MAX(score_id) FROM Scores"
         self.db.query(score_id_query)
         max_score_id = self.db.fetchone()[0]
@@ -93,9 +93,9 @@ class UserDAO:
         self.db.execute(user_query, (user.user_id, user.username, user.password, user.email, user.gender, user.profileImage))
 
         student_query = "INSERT INTO Students (user_id, student_id, grade, score_id) VALUES (?, ?, ?, ?)"
-        self.db.execute(student_query, (user.user_id, next_student_id, user.grade,next_score_id))
+        self.db.execute(student_query, (user.user_id, next_student_id, user.grade, next_score_id))
 
-        score_query = "INSERT INTO Score (score_id, attendance, midterm, final, assignment, scoreGrade VALUES (?, ?, ?, ?, ?, ?)"
+        score_query = "INSERT INTO Scores (score_id, attendance, midterm, final, assignment, scoreGrade) VALUES (?, ?, ?, ?, ?, ?)"
         self.db.execute(score_query, (next_score_id, user.score.attendance, user.score.midterm, user.score.final, user.score.assignment, user.score.scoreGrade))
 
     def get_user(self, user_id):
@@ -113,8 +113,8 @@ class UserDAO:
         score_id = self.db.fetchone()
 
         update_score_query = "UPDATE Scores SET attendance = ?, midterm = ?, final = ?, assignment = ?, scoreGrade = ?"
-        self.db.execute(update_score_query, (score.attendance, score.midterm, score.final, score.assignment, score.scoreGrade))
-
+        self.db.execute(update_score_query,
+                        (score.attendance, score.midterm, score.final, score.assignment, score.scoreGrade))
 
     def delete_user(self, user_id):
         query = "DELETE FROM Users WHERE user_id = ?"
@@ -124,17 +124,24 @@ class UserDAO:
         user_id_query = "SELECT user_id FROM Students WHERE student_id = ?"
         self.db.query(user_id_query, (student_id,))
         user_id = self.db.fetchone()
+        if user_id is not None:
+            user_id = user_id[0]
 
         score_id_query = "SELECT score_id FROM Students WHERE student_id = ?"
         self.db.query(score_id_query, (student_id,))
         score_id = self.db.fetchone()
+        if score_id is not None:
+            score_id = score_id[0]
 
         delete_user_query = "DELETE FROM Users WHERE user_id = ?"
         delete_student_query = "DELETE FROM Students WHERE student_id = ?"
         delete_score_query = "DELETE FROM Scores WHERE score_id = ?"
-        self.db.execute(delete_user_query, (user_id,))
+
+        if user_id is not None:
+            self.db.execute(delete_user_query, (user_id,))
         self.db.execute(delete_student_query, (student_id,))
-        self.db.execute(delete_score_query,(score_id,))       
+        if score_id is not None:
+            self.db.execute(delete_score_query, (score_id,))
 
     def get_all_users(self):
         query = "SELECT * FROM Users"
@@ -146,16 +153,16 @@ class UserDAO:
         self.db.query(query, (student_id,))
         count = self.db.fetchone()[0]
         return count > 0
-    
+
     def get_user_by_id(self, personal_id):
         query = """
         SELECT Users.*
         FROM Users
         JOIN Students ON Users.user_id = Students.user_id
         WHERE Students.student_id = ?
-        
+
         UNION
-        
+
         SELECT Users.*
         FROM Users
         JOIN Professors ON Users.user_id = Professors.user_id
@@ -167,9 +174,10 @@ class UserDAO:
     def get_user_by_name(self, username):
         query = "SELECT * FROM Users where username = ?"
         self.db.query(query, (username,))
-        return self.db.fetchone()  
+        return self.db.fetchone()
 
-    # get_user_by_name과 병합 예정
+        # get_user_by_name과 병합 예정
+
     def get_user_by_personal_id(self, personal_id):
         query = """
         SELECT u.user_id, u.username, u.password, u.email, u.gender, u.profileImage, s.student_id, s.grade, p.professor_id
@@ -193,7 +201,7 @@ class UserDAO:
                 'professor_id': row[8]
             }
         return None
-    
+
     def show_user_detail(self, connected_personal_id, finded_personal_id):
         if self.is_student_id(finded_personal_id):
             query = "SELECT Users.user_id, Users.username, Users.password, Users.email, Users.gender, Users.profileImage, Students.student_id, Students.grade, Scores.attendance, Scores.midterm, Scores.final, Scores.assignment, Scores.scoreGrade FROM Users JOIN Students ON Users.user_id = Students.user_id JOIN Scores ON Students.score_id = Scores.score_id WHERE Students.student_id = ?"
@@ -202,31 +210,31 @@ class UserDAO:
             if self.is_student_id(connected_personal_id):
                 if finded_personal_id == connected_personal_id:
                     return {
-                    "user_id": finded_user[0],
-                    "username": finded_user[1],
-                    "password": finded_user[2],
-                    "email": finded_user[3],
-                    "gender": finded_user[4],
-                    "profileImage": finded_user[5],
-                    "student_id": finded_user[6],
-                    "grade": finded_user[7],
-                    "attendance": finded_user[8],
-                    "midterm": finded_user[9],
-                    "final": finded_user[10],
-                    "assignment": finded_user[11],
-                    "scoreGrade": finded_user[12]
-                }
+                        "user_id": finded_user[0],
+                        "username": finded_user[1],
+                        "password": finded_user[2],
+                        "email": finded_user[3],
+                        "gender": finded_user[4],
+                        "profileImage": finded_user[5],
+                        "student_id": finded_user[6],
+                        "grade": finded_user[7],
+                        "attendance": finded_user[8],
+                        "midterm": finded_user[9],
+                        "final": finded_user[10],
+                        "assignment": finded_user[11],
+                        "scoreGrade": finded_user[12]
+                    }
                 else:
                     return {
-                    "user_id": finded_user[0],
-                    "username": finded_user[1],
-                    "password": finded_user[2],
-                    "email": finded_user[3],
-                    "gender": finded_user[4],
-                    "profileImage": finded_user[5],
-                    "student_id": finded_user[6],
-                    "grade": finded_user[7]
-                }
+                        "user_id": finded_user[0],
+                        "username": finded_user[1],
+                        "password": finded_user[2],
+                        "email": finded_user[3],
+                        "gender": finded_user[4],
+                        "profileImage": finded_user[5],
+                        "student_id": finded_user[6],
+                        "grade": finded_user[7]
+                    }
             else:
                 return {
                     "user_id": finded_user[0],
@@ -256,19 +264,17 @@ class UserDAO:
                 "profileImage": finded_user[5],
                 "professor_id": finded_user[6],
                 "rand": finded_user[7]
-        }
-        
+            }
+
     def get_student_by_user_id(self, user_id):
         query = "SELECT * FROM Students WHERE user_id = ?"
         self.db.query(query, (user_id,))
         return self.db.fetchone()
 
-
     def get_professor_by_user_id(self, user_id):
         query = "SELECT * FROM Professors WHERE user_id = ?"
         self.db.query(query, (user_id,))
         return self.db.fetchone()
-
 
 
 class GroupDAO:
@@ -309,14 +315,12 @@ class GroupDAO:
         # 튜플을 딕셔너리로 변환
         return [{"group_id": group[0], "group_name": group[1]} for group in groups]
 
-
     def get_group_by_name(self, group_name):
         query = "SELECT * FROM CAUGroups WHERE group_name LIKE ?"
         self.db.query(query, ('%' + group_name + '%',))
         groups = self.db.fetchall()
         # 튜플을 딕셔너리로 변환
         return [{"group_id": group[0], "group_name": group[1]} for group in groups]
-
 
     def get_groups_by_member_name(self, member_name):
         query = """
@@ -360,6 +364,7 @@ class GroupDAO:
             group["member_count"] = len(group["members"])
             return group
         return None
+
     def check_user_access(self, group_id, personal_id):
         members_query = """
         SELECT 1 FROM GroupMembers gm
@@ -367,6 +372,7 @@ class GroupDAO:
         """
         self.db.query(members_query, (group_id, personal_id))
         return self.db.fetchone() is not None
+
     def check_user_access(self, group_id, personal_id):
         members_query = """
         SELECT 1 FROM GroupMembers gm
@@ -378,7 +384,6 @@ class GroupDAO:
     def add_member_to_group(self, group_id, student_id):
         query = "INSERT INTO GroupMembers (group_id, personal_id) VALUES (?, ?)"
         self.db.execute(query, (group_id, student_id))
-
 
     def delete_member_from_group(self, group_id, student_id):
         query = "DELETE FROM GroupMembers WHERE group_id = ? AND personal_id = ?"

@@ -18,11 +18,9 @@ class UserListPage(QWidget):
         search_layout = QHBoxLayout()
         self.search_box = QLineEdit(self)
         self.search_box.setPlaceholderText("사용자 검색")
-        # 검색이 시작되면 화면 새로 로딩
-        self.search_box.textChanged.connect(self.show)
+        self.search_box.textChanged.connect(self.filter_users)
         search_layout.addWidget(self.search_box)
 
-        
         # + 버튼 추가
         if self.main_window.user_type == "professor":
             self.add_button = QPushButton("+", self)
@@ -40,8 +38,6 @@ class UserListPage(QWidget):
             self.userListWidget.setColumnCount(2)
         layout.addWidget(self.userListWidget)
 
-        self.show()
-
         self.userListWidget.itemClicked.connect(self.open_detail_page)
 
         # 뒤로가기 버튼
@@ -53,13 +49,20 @@ class UserListPage(QWidget):
         layout.addItem(QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding))
         self.setLayout(layout)
 
+        self.show()
+
     def filter_users(self):
         search_text = self.search_box.text().lower()
-        for item in self.user_items:
-            item.setHidden(search_text not in item.text().lower())
+        for row in range(self.userListWidget.rowCount()):
+            match = False
+            for column in range(self.userListWidget.columnCount()):
+                item = self.userListWidget.item(row, column)
+                if item and search_text in item.text().lower():
+                    match = True
+                    break
+            self.userListWidget.setRowHidden(row, not match)
 
     def open_detail_page(self):
-        # 로직 : 우선 클릭된 셀의 행 값 추출 -> 해당 행의 2번째 값(index=1)의 text추출(학번값) -> 해당 값을 디테일 페이지에 인수로 넘김
         student_id = int(self.userListWidget.item(self.userListWidget.currentRow(), 1).text())
         self.detail_page = UserDetailPage(self.main_window, student_id)
         self.main_window.setCentralWidget(self.detail_page)
@@ -77,7 +80,7 @@ class UserListPage(QWidget):
         self.userListWidget.clear()
 
         if self.main_window.user_type == "professor":
-        # 테이블 열 이름 지정
+            # 테이블 열 이름 지정
             self.userListWidget.setHorizontalHeaderLabels(["name", "studentID", "delete"])
         else:
             self.userListWidget.setHorizontalHeaderLabels(["name", "studentID"])
@@ -88,10 +91,9 @@ class UserListPage(QWidget):
         # 유저 데이터 가져오기
         users = self.get_users()
         print("users in UserList:", users, "\n\n")
-        for user in users:
-            if user['is_student'] == False:
-                users.remove(user)
+        users = [user for user in users if user['is_student']]
         print("users in UserList without pro :", users, "\n\n")
+
         # 행 갯수 지정
         self.userListWidget.setRowCount(len(users))
 
@@ -106,11 +108,14 @@ class UserListPage(QWidget):
                 delete_button.clicked.connect(lambda _, row=i: self.delete_user(row))
                 self.userListWidget.setCellWidget(i, 2, delete_button)
 
+        # Apply the filter to the newly populated table
+        self.filter_users()
+
     def delete_user(self, row):
         student_id = self.userListWidget.item(row, 1).text()
 
         # Display confirmation dialog
-        reply = QMessageBox.question(self, 'Confirmation', '삭제하시겠습니까?', QMessageBox.Yes | QMessageBox.No,QMessageBox.No)
+        reply = QMessageBox.question(self, 'Confirmation', '삭제하시겠습니까?', QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
 
         # If confirmed, delete the user
         if reply == QMessageBox.Yes:
@@ -119,7 +124,6 @@ class UserListPage(QWidget):
             # Show completion message and update the view
             QMessageBox.information(self, 'Deleted', '유저가 삭제되었습니다.')
             self.show()
-
 
     def open_user_creat_page(self):
         self.user_create_page = UserCreatePage(self.main_window)

@@ -160,10 +160,10 @@ class MainWindow(QMainWindow):
 
     # ---- 유저 생성 및 삭제 ----- #
     def delete_user(self, student_id):
-        self.manager.delete_user(student_id)
+        self.manager.delete_student(student_id)
     
     def create_user(self, user_id: str, username: str, password: str, email: str, gender: str):
-        self.manager.create_user(user_id, username, password, email, gender)
+        self.manager.create_student(user_id, username, password, email, gender)
 
 
 if __name__ == "__main__":
