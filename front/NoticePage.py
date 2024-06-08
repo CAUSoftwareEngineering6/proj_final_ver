@@ -82,17 +82,19 @@ class NoticePage(QWidget):
         self.notice_label = QLabel('공지란')
         self.layout.addWidget(self.notice_label)
 
-        self.notice_input_title = QTextEdit()
-        self.notice_input_title.setFixedHeight(30)  # 공지 작성 박스 높이 조정
-        self.layout.addWidget(self.notice_input_title)
+        if self.main_window.user_type == "professor":
 
-        self.notice_input_text = QTextEdit()
-        self.notice_input_text.setFixedHeight(70)  # 공지 작성 박스 높이 조정
-        self.layout.addWidget(self.notice_input_text)
+            self.notice_input_title = QTextEdit()
+            self.notice_input_title.setFixedHeight(30)  # 공지 작성 박스 높이 조정
+            self.layout.addWidget(self.notice_input_title)
 
-        self.notice_button = QPushButton('공지 작성')
-        self.notice_button.clicked.connect(self.add_notice)
-        self.layout.addWidget(self.notice_button)
+            self.notice_input_text = QTextEdit()
+            self.notice_input_text.setFixedHeight(70)  # 공지 작성 박스 높이 조정
+            self.layout.addWidget(self.notice_input_text)
+
+            self.notice_button = QPushButton('공지 작성')
+            self.notice_button.clicked.connect(self.add_notice)
+            self.layout.addWidget(self.notice_button)
 
         self.notice_list = QListWidget()
         self.layout.addWidget(self.notice_list)
@@ -138,6 +140,7 @@ class NoticePage(QWidget):
         for i in range(len(announcement)):
             item = QListWidgetItem()
             post_id = announcement[i]['post_id']
+            writer_name = announcement[i]['writer_name']
             widget = QWidget()
             layout = QHBoxLayout()
             layout.setContentsMargins(0, 0, 0, 0)
@@ -147,15 +150,16 @@ class NoticePage(QWidget):
             layout.setSpacing(10)
             layout.addWidget(label)
 
-            edit_button = QPushButton(f'✎')
-            edit_button.setFixedSize(30, 30)
-            edit_button.clicked.connect(lambda _, post_id=post_id, label=label: self.edit_notice(post_id, label))
-            layout.addWidget(edit_button)
+            if self.main_window.user_type == "professor" :
+                edit_button = QPushButton(f'✎')
+                edit_button.setFixedSize(30, 30)
+                edit_button.clicked.connect(lambda _, post_id=post_id, label=label: self.edit_notice(post_id, label))
+                layout.addWidget(edit_button)
 
-            delete_button = QPushButton(f'✖')
-            delete_button.setFixedSize(30, 30)
-            delete_button.clicked.connect(lambda _, post_id=post_id: self.delete_notice(post_id))
-            layout.addWidget(delete_button)
+                delete_button = QPushButton(f'✖')
+                delete_button.setFixedSize(30, 30)
+                delete_button.clicked.connect(lambda _, post_id=post_id: self.delete_notice(post_id))
+                layout.addWidget(delete_button)
 
             widget.setLayout(layout)
             item.setSizeHint(widget.sizeHint())
