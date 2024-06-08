@@ -8,6 +8,7 @@ from .Announcement import Announcement
 from .Comment import Comment
 from .Student_and_Professor import *
 from .Score import *
+import random
 
 class Management:
     def __init__(self, db_path='SWE.db'):
@@ -29,8 +30,16 @@ class Management:
         self.user_dao.add_user(new_user)
         return True
     
-    def create_student(self, user_id, username, password, email, gender, student_id, grade, attendance, midterm, final, assignment, scoreGrade):
+    def create_student(self, user_id, username, password, email, gender):
+        student_id = random.randint(0, 100)
+        grade = random.randint(0,100)
+        attendance = random.randint(0, 100)
+        midterm = random.randint(0, 100)
+        final = random.randint(0, 100)
+        assignment = random.randint(0, 100)
+        scoreGrade = random.randint(0, 100)
         new_student = Student(user_id, username, password, email, gender, student_id, grade, Score(attendance, midterm, final, assignment, scoreGrade))
+        self.user_dao.add_student(new_student)
 
     def delete_user(self, user_id):
         user = self.get_user(user_id)
