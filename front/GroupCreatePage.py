@@ -58,6 +58,7 @@ class GroupCreatePage(QWidget):
 
         if checked_users:
             print("Checked usernames:", checked_users)
+
             QMessageBox.information(self, "Success", "그룹이 생성되었습니다!")
         else :
             QMessageBox.information(self, "Fail", "체크를 해주세요!")
@@ -69,14 +70,17 @@ class GroupCreatePage(QWidget):
         # 기존 테이블 지우기
         self.userListWidget.clear()
 
-        # 테이블 열 이름 지정
-        self.userListWidget.setHorizontalHeaderLabels(["", "name", "studentID"])
+
+        self.userListWidget.setHorizontalHeaderLabels(["name", "studentID"])
 
         # 테이블 칸 너비 조절
         self.userListWidget.horizontalHeader().setStretchLastSection(True)
 
         # 유저 데이터 가져오기
         users = self.get_users()
+        print("users in UserList:", users, "\n\n")
+        users = [user for user in users if user['is_student']]
+        print("users in UserList without pro :", users, "\n\n")
 
         # 행 갯수 지정
         self.userListWidget.setRowCount(len(users))
@@ -86,6 +90,6 @@ class GroupCreatePage(QWidget):
             checkbox = QCheckBox()
             self.userListWidget.setCellWidget(i, 0, checkbox)
             name = QTableWidgetItem(user['username'])
-            student_id = QTableWidgetItem(user['student_id'])
+            student_id = QTableWidgetItem(str(user['personal_id']))
             self.userListWidget.setItem(i, 1, name)
             self.userListWidget.setItem(i, 2, student_id)
