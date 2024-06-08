@@ -101,6 +101,7 @@ class NoticeDetailPage(QWidget):
                 for comment in ann['comment_list']:
                     item = QListWidgetItem()
                     comment_id = comment['comment_id']
+                    comment_username = comment['comment_username']
                     widget = QWidget()
                     comment_layout = QHBoxLayout()
                     comment_layout.setContentsMargins(0, 0, 0, 0)
@@ -109,17 +110,17 @@ class NoticeDetailPage(QWidget):
                     reply_label = QLabel(f" - {comment['comment_content']}")
                     reply_label.setWordWrap(True)
                     comment_layout.addWidget(reply_label)
+                    if (comment_username == self.main_window.username) or (self.main_window == "professor"):
+                        edit_button = QPushButton('✎')
+                        edit_button.setFixedSize(30, 30)
+                        edit_button.clicked.connect(lambda _, post_id=self.post_id, reply_label=reply_label, comment_id=comment_id: self.edit_comment(post_id, reply_label, comment_id))
+                        comment_layout.addWidget(edit_button)
 
-                    edit_button = QPushButton('✎')
-                    edit_button.setFixedSize(30, 30)
-                    edit_button.clicked.connect(lambda _, post_id=self.post_id, reply_label=reply_label, comment_id=comment_id: self.edit_comment(post_id, reply_label, comment_id))
-                    comment_layout.addWidget(edit_button)
-
-                    delete_button = QPushButton('✖')
-                    delete_button.setFixedSize(30, 30)
-                    delete_button.clicked.connect(
-                        lambda _, post_id=self.post_id, comment_id=comment_id: self.delete_comment(post_id, comment_id))
-                    comment_layout.addWidget(delete_button)
+                        delete_button = QPushButton('✖')
+                        delete_button.setFixedSize(30, 30)
+                        delete_button.clicked.connect(
+                            lambda _, post_id=self.post_id, comment_id=comment_id: self.delete_comment(post_id, comment_id))
+                        comment_layout.addWidget(delete_button)
 
                     widget.setLayout(comment_layout)
                     item.setSizeHint(widget.sizeHint())
