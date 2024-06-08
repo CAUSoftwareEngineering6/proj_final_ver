@@ -163,7 +163,11 @@ class MainWindow(QMainWindow):
         self.manager.delete_student(student_id)
     
     def create_user(self, user_id: str, username: str, password: str, email: str, gender: str):
-        self.manager.create_student(user_id, username, password, email, gender)
+        self.manager.create_user(user_id, username, password, email, gender)
+
+    # ---- 그룹 생성 및 삭제 ----- #
+    def delete_group(self, group_id):
+        self.manager.delete_group(group_id)
 
 
 if __name__ == "__main__":
