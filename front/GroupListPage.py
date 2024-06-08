@@ -1,5 +1,5 @@
 from PyQt5.QtWidgets import QApplication, QDesktopWidget, QWidget, QListWidget, QListWidgetItem, QVBoxLayout, \
-    QSpacerItem, QSizePolicy, QPushButton, QLineEdit, QHBoxLayout, QLabel, QGroupBox, QMessageBox
+    QSpacerItem, QSizePolicy, QPushButton, QLineEdit, QHBoxLayout, QLabel, QGroupBox, QMessageBox, QScrollArea
 from LoginWindow import *
 from GroupSelectPage import GroupSelectPage
 from GroupCreatePage import GroupCreatePage
@@ -26,19 +26,19 @@ class GroupListPage(QWidget):
         if self.main_window.user_type == "professor":
             self.add_button = QPushButton("+", self)
             self.add_button.setFixedSize(30, 30)
-            self.add_button.clicked.connect(self.open_group_creat_page)
+            self.add_button.clicked.connect(self.open_group_create_page)
             self.search_layout.addWidget(self.add_button)
 
         self.layout.addLayout(self.search_layout)
 
-        # 여기서 데이터 다 읽어오고, 나머지는 기존 코드 활용
-        self.groups = self.main_window.get_all_group()
+        self.scroll_area = QScrollArea(self)
+        self.scroll_area.setWidgetResizable(True)
+        self.scroll_content = QWidget()
+        self.scroll_layout = QVBoxLayout(self.scroll_content)
+        self.scroll_content.setLayout(self.scroll_layout)
+        self.scroll_area.setWidget(self.scroll_content)
 
-        self.group_boxes = []
-        for group in self.groups:
-            group_box = self.create_group_box(group)
-            self.group_boxes.append(group_box)
-            self.layout.addWidget(group_box)
+        self.layout.addWidget(self.scroll_area)
 
         # 뒤로가기 버튼
         self.back_button = QPushButton('선택 페이지로 돌아가기')
@@ -47,8 +47,11 @@ class GroupListPage(QWidget):
 
         self.setLayout(self.layout)
 
+        self.show()
+
     def create_group_box(self, group):
         group_box = QGroupBox(group['group_name'])
+        group_box.setFixedSize(350, 100)  # Set fixed size for group boxes
         group_layout = QVBoxLayout()
 
         info_layout = QHBoxLayout()
@@ -64,7 +67,7 @@ class GroupListPage(QWidget):
             lock_button.setText('🔒')
             lock_button.clicked.connect(lambda _, g=group, gb=group_box: self.toggle_members(g, gb))
             info_layout.addWidget(lock_button)
-            
+
         if self.main_window.user_type == "professor":
             delete_button = QPushButton('delete')
             delete_button.clicked.connect(lambda _, g=group: self.confirm_delete_group(g))
@@ -82,7 +85,7 @@ class GroupListPage(QWidget):
 
     def toggle_members(self, group, group_box):
         members_label = group_box.members_label
-        members_label.setVisible(members_label.isVisible() == 0)
+        members_label.setVisible(not members_label.isVisible())
 
     def filter_groups(self):
         search_text = self.search_box.text().lower()
@@ -99,7 +102,7 @@ class GroupListPage(QWidget):
         self.main_window.statusBar().showMessage(group['group_name'] + ' Select Page')
         self.main_window.group_id = group['group_id']
 
-    def open_group_creat_page(self):
+    def open_group_create_page(self):
         self.group_create_page = GroupCreatePage(self.main_window)
         self.main_window.setCentralWidget(self.group_create_page)
         self.main_window.statusBar().showMessage('Create Group Page')
@@ -111,7 +114,26 @@ class GroupListPage(QWidget):
         reply = QMessageBox.question(self, 'Confirmation', f"그룹 '{group['group_name']}'을(를) 삭제하시겠습니까?",
                                      QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
         if reply == QMessageBox.Yes:
-            self.delete_group(group)
+            group_id = group['group_id']
+            self.main_window.delete_group(group_id)
+            print(f"delete group with group ID: {group_id}")
+            # Show completion message and update the view
+            QMessageBox.information(self, 'Deleted', '그룹이 삭제되었습니다.')
+            self.show()
 
-    def delete_group(self, group):
-        pass
+    def show(self):
+        # Clear the existing widgets in the layout
+        while self.scroll_layout.count() > 0:
+            item = self.scroll_layout.takeAt(0)
+            if item.widget():
+                item.widget().deleteLater()
+
+        self.groups = self.main_window.get_all_group()
+        self.group_boxes = []
+
+        for group in self.groups:
+            group_box = self.create_group_box(group)
+            self.group_boxes.append(group_box)
+            self.scroll_layout.addWidget(group_box)
+
+        self.filter_groups()
