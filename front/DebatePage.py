@@ -89,7 +89,8 @@ class DebatePage(QWidget):
                 delete_button.setFixedSize(30, 30)
                 delete_button.clicked.connect(lambda _, post_id=post_id: self.delete_discussion(post_id))
                 topic_layout.addWidget(delete_button)
-                layout.addLayout(topic_layout)
+                
+            layout.addLayout(topic_layout)
 
             widget.setLayout(layout)
             item.setSizeHint(widget.sizeHint())
