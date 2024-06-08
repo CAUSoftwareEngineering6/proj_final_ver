@@ -71,6 +71,7 @@ class DebatePage(QWidget):
             layout.setContentsMargins(0, 0, 0, 0)
             layout.setSpacing(10)
             post_id = deb['post_id']
+            writer_name = deb['writer_name']
 
             topic_layout = QHBoxLayout()
             topic_label = QLabel(f"{post_id}. {deb['post_name']}")
@@ -78,16 +79,17 @@ class DebatePage(QWidget):
             topic_label.mousePressEvent = lambda event, post_id=post_id: self.open_reply_page(post_id)
             topic_layout.addWidget(topic_label)
 
-            edit_button = QPushButton('✎')
-            edit_button.setFixedSize(30, 30)
-            edit_button.clicked.connect(lambda _, post_id=post_id, label=topic_label: self.edit_discussion(post_id, label))
-            topic_layout.addWidget(edit_button)
+            if (writer_name == self.main_window.username) or (self.main_window == "professor") :
+                edit_button = QPushButton('✎')
+                edit_button.setFixedSize(30, 30)
+                edit_button.clicked.connect(lambda _, post_id=post_id, label=topic_label: self.edit_discussion(post_id, label))
+                topic_layout.addWidget(edit_button)
 
-            delete_button = QPushButton('✖')
-            delete_button.setFixedSize(30, 30)
-            delete_button.clicked.connect(lambda _, post_id=post_id: self.delete_discussion(post_id))
-            topic_layout.addWidget(delete_button)
-            layout.addLayout(topic_layout)
+                delete_button = QPushButton('✖')
+                delete_button.setFixedSize(30, 30)
+                delete_button.clicked.connect(lambda _, post_id=post_id: self.delete_discussion(post_id))
+                topic_layout.addWidget(delete_button)
+                layout.addLayout(topic_layout)
 
             widget.setLayout(layout)
             item.setSizeHint(widget.sizeHint())
