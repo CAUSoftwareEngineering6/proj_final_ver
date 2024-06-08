@@ -167,6 +167,9 @@ class MainWindow(QMainWindow):
 
 
     # ---- 그룹 생성 및 삭제 ----- #
+    def create_group(self, group_name):
+        self.manager.create_group(group_name,self.user_id)
+
     def delete_group(self, group_id):
         self.manager.delete_group(group_id)
 

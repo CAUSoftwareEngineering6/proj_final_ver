@@ -16,13 +16,19 @@ class GroupCreatePage(QWidget):
         self.back_Button.clicked.connect(self.go_back)
         layout.addWidget(self.back_Button)
 
+        self.group_name_label = QLabel("그룹 이름")
+        layout.addWidget(self.group_name_label)
+
+        self.group_name_input = QLineEdit()
+        layout.addWidget(self.group_name_input)
+
         # UserList 를 TableWidget으로 표현
         self.userListWidget = QTableWidget(self)
         self.userListWidget.setColumnCount(3)  # 체크박스 열을 위해 3열로 변경
         layout.addWidget(self.userListWidget)
 
         # create 그룹 버튼
-        self.createButton = QPushButton("Creat", self)
+        self.createButton = QPushButton("Create", self)
         self.createButton.clicked.connect(self.create_group)
         layout.addWidget(self.createButton)
 
@@ -55,9 +61,12 @@ class GroupCreatePage(QWidget):
                 username_item = self.userListWidget.item(row, 1)
                 checked_users.append(username_item.text())
                 checkbox.setChecked(False)  # 체크박스를 초기화
+                self.group_name_input.clear() # 그룹 이름 초기화
 
         if checked_users:
             print("Checked usernames:", checked_users)
+            # 그룹 생성
+            self.main_window.create_group(self.group_name_input.text())
 
             QMessageBox.information(self, "Success", "그룹이 생성되었습니다!")
         else :
@@ -71,7 +80,7 @@ class GroupCreatePage(QWidget):
         self.userListWidget.clear()
 
 
-        self.userListWidget.setHorizontalHeaderLabels(["name", "studentID"])
+        self.userListWidget.setHorizontalHeaderLabels(["check","name", "studentID"])
 
         # 테이블 칸 너비 조절
         self.userListWidget.horizontalHeader().setStretchLastSection(True)
