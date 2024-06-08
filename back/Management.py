@@ -32,12 +32,33 @@ class Management:
     
     def create_student(self, user_id, username, password, email, gender):
         student_id = random.randint(0, 100)
-        grade = random.randint(0,100)
+        grade = random.randint(1,4)
+        # 숫자 학년을 문자로 치환
+        if grade == 1:
+            grade = "FreshMan"
+        elif grade == 2:
+            grade = "Sophomore"
+        elif grade == 3:
+            grade = "Junior"
+        else:
+            grade = "Senior"
         attendance = random.randint(0, 100)
         midterm = random.randint(0, 100)
         final = random.randint(0, 100)
         assignment = random.randint(0, 100)
-        scoreGrade = random.randint(0, 100)
+        scoreGrade = midterm+final+assignment+attendance
+        # 점수 구간 별로 학점 부여
+        if 400 >= scoreGrade >= 351:
+            scoreGrade = 'A+'
+        elif 350 >= scoreGrade >= 301:
+            scoreGrade = 'A'
+        elif 300 >= scoreGrade >= 251:
+            scoreGrade = 'B+'
+        elif 250 >= scoreGrade >= 201:
+            scoreGrade = 'B'
+        else:
+            scoreGrade = 'C'
+       
         new_student = Student(user_id, username, password, email, gender, student_id, grade, Score(attendance, midterm, final, assignment, scoreGrade))
         self.user_dao.add_student(new_student)
 
