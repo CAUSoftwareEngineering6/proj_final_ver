@@ -15,10 +15,10 @@ class UserDetailPage(QWidget):
 
         self.userDetailList = QListWidget()
 
-        self.userDetailList.addItems(["user_id :" + user['user_id'],"user_name : "+user['username'],"student_id : "+str(user['student_id'])])
+        self.userDetailList.addItems(["user id : " + user['user_id'],"user name : "+user['username'],"student id : "+str(user['student_id']), "grade : " + str(user['grade'])])
         if user['student_id'] == self.main_window.user_id or self.main_window.user_type == "professor":
-            self.userDetailList.addItems(["grade : " + user['grade']])
-
+            self.userDetailList.addItems(["\n[score]", "midterm : " + str(user['midterm']), "final : " + str(user['final']), "assignment : " + str(user['assignment']), "attendance : " + str(user['attendance']) ])
+            self.userDetailList.addItem("\nMark : " + user['scoreGrade'])
         layout.addWidget(self.userDetailList)
         
         # QPushButton for back
