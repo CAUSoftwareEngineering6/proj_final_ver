@@ -35,10 +35,12 @@ class GroupSelectPage(QWidget):
     def go_to_notice(self):
         self.notice_window = NoticePage(self.group, self.main_window, self.group_id, self.username)
         self.main_window.setCentralWidget(self.notice_window)
+        self.main_window.statusBar().showMessage(self.group['group_name']+' Anouncment Page')
 
     def go_to_discussion(self):
         self.discussion_window = DebatePage(self.group, self.main_window, self.group_id, self.username)
         self.main_window.setCentralWidget(self.discussion_window)
+        self.main_window.statusBar().showMessage(self.group['group_name']+' Debate Page')
 
     def go_back(self):
         self.main_window.go_back_to_group_list()

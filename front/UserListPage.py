@@ -128,4 +128,4 @@ class UserListPage(QWidget):
     def open_user_creat_page(self):
         self.user_create_page = UserCreatePage(self.main_window)
         self.main_window.setCentralWidget(self.user_create_page)
-        self.main_window.statusBar().showMessage('User Detail Page')
+        self.main_window.statusBar().showMessage('User Create Page')
