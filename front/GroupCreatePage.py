@@ -58,7 +58,8 @@ class GroupCreatePage(QWidget):
         for row in range(self.userListWidget.rowCount()):
             checkbox = self.userListWidget.cellWidget(row, 0)
             if checkbox is not None and checkbox.isChecked():
-                username_item = self.userListWidget.item(row, 1)
+                username_item = self.userListWidget.item(row, 2)
+                print("\nuser name item : ", username_item.text())
                 checked_users.append(username_item.text())
                 checkbox.setChecked(False)  # 체크박스를 초기화
                 self.group_name_input.clear() # 그룹 이름 초기화
@@ -66,7 +67,7 @@ class GroupCreatePage(QWidget):
         if checked_users:
             print("Checked usernames:", checked_users)
             # 그룹 생성
-            self.main_window.create_group(self.group_name_input.text())
+            self.main_window.create_group(self.group_name_input.text(), checked_users)
 
             QMessageBox.information(self, "Success", "그룹이 생성되었습니다!")
         else :
